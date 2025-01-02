@@ -17,12 +17,13 @@ Route::get('/', function () {
 
 Route::get('recipes/search/{query}/{category?}', [RecipesController::class, 'show']); // category is optional
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
 
     Route::get('/recipes', [RecipesController::class, 'index'])->name('recipes.index');
     Route::post('/api/add_recipe', [RecipesController::class, 'store']);
     Route::put('/api/edit_recipe/{id}', [RecipesController::class, 'edit']);
+    Route::delete('/api/delete_recipe/{id}', [RecipesController::class, 'destroy']);
 
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -65,7 +65,6 @@ export default function index({ recipes }: { recipes: RecipeList<Recipe> }) {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
-                'X-XSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify(form),
             credentials: 'same-origin',
@@ -103,6 +102,41 @@ export default function index({ recipes }: { recipes: RecipeList<Recipe> }) {
             instructions: recipe.instructions || [''],
         });
     };
+
+    const handleDelete = (id: number) => {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (!csrfToken) {
+            alert('CSRF token is missing');
+            return;
+        }
+
+        fetch(`/api/delete_recipe/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        console.error('Error:', errorData);
+                        alert(`Failed to delete recipe: ${errorData.message || 'Unknown error'}`);
+                        throw new Error('Request failed');
+                    });
+                }
+                return response.json();
+            })
+            .then(() => {
+                alert('Recipe deleted successfully!');
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the recipe.');
+            });
+    };
+
     // console.log(recipes);
 
     return (
@@ -259,7 +293,7 @@ export default function index({ recipes }: { recipes: RecipeList<Recipe> }) {
                     {/* recipe item list */}
                     <div className="mt-8 grid grid-cols-1 gap-6">
                         {recipes.data.map((recipe: Recipe) => (
-                            <RecipeItem key={recipe.id} data={recipe} onEdit={handleEdit} />
+                            <RecipeItem key={recipe.id} data={recipe} onEdit={handleEdit} onDelete={handleDelete} />
                         ))}
                     </div>
                 </div>

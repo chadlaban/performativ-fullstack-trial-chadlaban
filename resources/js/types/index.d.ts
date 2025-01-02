@@ -53,6 +53,7 @@ export type RecipeList<T = any> = {
 export type DataProps = {
     data: Recipe;
     onEdit: (updatedData: Recipe) => void;
+    onDelete: (id: number) => void;
 };
 
 export type PageProps<
