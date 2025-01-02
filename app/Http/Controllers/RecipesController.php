@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Recipes;
+use App\Http\Resources\RecipeResource;
+use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 class RecipesController extends Controller
@@ -34,9 +36,44 @@ class RecipesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Recipes $recipes)
+    public function show(Request $request, $query, $category = null)
     {
-        //
+        $searchQuery = $query;
+        $category = $category ?? null; // optional
+
+        $recipes = Recipes::query()
+            ->when($searchQuery !== 'all' && !empty($searchQuery), function ($queryBuilder) use ($searchQuery, $category) {
+                // error_log('---------');
+                // error_log($searchQuery);
+                // error_log($category);
+                // error_log('---------');
+
+                // search
+                $queryBuilder->where(function ($query) use ($searchQuery, $category) {
+                    if (!empty($category)) {
+                        $query->whereHas('categories', function ($query) use ($category) {
+                            $query->where('categories.id', $category);
+                        });
+                    }
+                    $query->where(function ($query) use ($searchQuery) {
+                        $query->where('name', 'like', '%' . $searchQuery . '%')
+                            ->orWhere('description', 'like', '%' . $searchQuery . '%');
+                    });
+                });
+            })
+            ->when(!empty($category), function ($queryBuilder) use ($category) {
+                // category
+                $queryBuilder->whereHas('categories', function ($query) use ($category) {
+                    $query->where('categories.id', $category);
+                });
+            })
+            ->get();
+
+        // error_log('---------');
+        // error_log($recipes);
+        // error_log('---------');
+
+        return response()->json($recipes);
     }
 
     /**
