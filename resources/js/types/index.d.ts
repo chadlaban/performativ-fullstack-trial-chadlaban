@@ -46,10 +46,13 @@ export interface NutritionalValues {
     sugar_g: number;
 }
 
-export type RecipeList = Recipe[];
+export type RecipeList<T = any> = {
+    data: T[];
+}
 
 export type DataProps = {
     data: Recipe;
+    onEdit: (updatedData: Recipe) => void;
 };
 
 export type PageProps<

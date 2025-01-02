@@ -21,6 +21,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
 
     Route::get('/recipes', [RecipesController::class, 'index'])->name('recipes.index');
+    Route::post('/api/add_recipe', [RecipesController::class, 'store']);
+    Route::put('/api/edit_recipe/{id}', [RecipesController::class, 'edit']);
 
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
