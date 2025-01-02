@@ -8,6 +8,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Recipes extends Model
 {
+    protected $casts = [
+        'ingredients' => 'array',
+        'instructions' => 'array',
+    ];
+
+    protected $fillable = [
+        'name',
+        'description',
+        'ingredients',
+        'instructions',
+        'user_id',
+        'category_id',
+        'created_by',
+        'created_at',
+        'deleted_at',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -15,6 +32,6 @@ class Recipes extends Model
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class, 'categories_recipes');
+        return $this->belongsToMany(Categories::class, 'categories_recipes');
     }
 }
