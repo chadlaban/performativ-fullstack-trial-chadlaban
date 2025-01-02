@@ -17,4 +17,16 @@ Route::get('/', function () {
 
 Route::get('recipes/search/{query}/{category?}', [RecipesController::class, 'show']); // category is optional
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', fn() => Inertia::render('Dashboard'))->name('dashboard');
+
+    Route::get('/recipes', [RecipesController::class, 'index'])->name('recipes.index');
+
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    });
+});
+
 require __DIR__.'/auth.php';
