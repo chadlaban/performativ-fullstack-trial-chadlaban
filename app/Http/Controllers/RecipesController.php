@@ -6,6 +6,7 @@ use App\Models\Recipes;
 use App\Http\Resources\RecipesResource;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class RecipesController extends Controller
 {
@@ -16,7 +17,9 @@ class RecipesController extends Controller
     {
         $user = $request->user(); // authenticated user
 
-        $recipes = $user->recipes()->latest()->paginate();
+        if (!$user) return response()->json(['message' => 'User not authenticated'], 401);
+
+        $recipes = $user->recipes()->latest()->get();
 
         return Inertia::render('Recipes/Index', [
             'recipes' => RecipesResource::collection($recipes)
@@ -36,7 +39,35 @@ class RecipesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user = auth()->user();
+
+        if (!$user) return response()->json(['message' => 'User not authenticated'], 401);
+
+        // validate incoming request data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'ingredients' => 'required|array',
+            'instructions' => 'required|array',
+            'category_id' => 'numeric'
+        ]);
+
+        $recipe = Recipes::create([
+            'name' => $validatedData['name'],
+            'description' => $validatedData['description'],
+            'ingredients' => $validatedData['ingredients'],
+            'instructions' => $validatedData['instructions'],
+            'category_id' => $validatedData['category_id'],
+            'user_id' => $user->id,
+            'created_by' => $user->name,
+        ]);
+
+        if ($request->has('category_id')) $recipe->categories()->sync($request->input('category_id'));
+
+        return response()->json([
+            'message' => 'Recipe created successfully!',
+            'recipe' => $recipe,
+        ], 201);
     }
 
     /**
@@ -85,9 +116,45 @@ class RecipesController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Recipes $recipes)
+    public function edit(Request $request, $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'ingredients' => 'required|array',
+            'ingredients.*' => 'string',
+            'instructions' => 'required|array',
+            'instructions.*' => 'string',
+            'category_id' => 'numeric'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation error',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $recipe = Recipes::find($id);
+
+        if (!$recipe) {
+            return response()->json([
+                'message' => 'Recipe not found',
+            ], 404);
+        }
+
+        $recipe->name = $request->input('name');
+        $recipe->description = $request->input('description');
+        $recipe->ingredients = $request->input('ingredients');
+        $recipe->instructions = $request->input('instructions');
+        $recipe->categories()->sync($request->input('category_id'));
+
+        $recipe->save();
+
+        return response()->json([
+            'message' => 'Recipe updated successfully',
+            'data' => $recipe,
+        ]);
     }
 
     /**
