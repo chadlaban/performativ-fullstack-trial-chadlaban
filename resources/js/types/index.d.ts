@@ -46,6 +46,12 @@ export interface NutritionalValues {
     sugar_g: number;
 }
 
+export type RecipeList = Recipe[];
+
+export type DataProps = {
+    data: Recipe;
+};
+
 export type PageProps<
     T extends Record<string, unknown> = Record<string, unknown>,
 > = T & {
