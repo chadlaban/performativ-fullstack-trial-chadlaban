@@ -5,6 +5,7 @@
         <meta name="author" content="Chad Laban">
         <meta name="description" content="Performativ FullStack Trial Project">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title inertia>{{ config('app.name', 'DishData') }}</title>
 
