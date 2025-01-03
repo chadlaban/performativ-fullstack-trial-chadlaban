@@ -61,13 +61,13 @@ export default function index({ recipes }: { recipes: RecipeList<Recipe> }) {
 
         fetch(url, {
             method,
+            credentials: 'same-origin',
+            body: JSON.stringify(form),
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
             },
-            body: JSON.stringify(form),
-            credentials: 'same-origin',
         })
             .then(response => {
                 if (!response.ok) {

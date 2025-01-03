@@ -42,31 +42,31 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // create users
-        $guest = User::factory()->create([
+        $guest = User::create([
             'name' => 'Guest User',
             'email' => 'guest@example.com',
             'password' => bcrypt('performativ1234'),
         ])->assignRole(RolesEnum::Guest);
 
-        $user1 = User::factory()->create([
+        $user1 = User::create([
             'name' => 'Chad Doe',
             'email' => 'user1@example.com',
             'password' => bcrypt('performativ1234u1'),
         ])->assignRole(RolesEnum::User);
 
-        $user2 = User::factory()->create([
+        $user2 = User::create([
             'name' => 'John Doe',
             'email' => 'user2@example.com',
             'password' => bcrypt('performativ1234u2'),
         ])->assignRole(RolesEnum::User);
 
-        $user3 = User::factory()->create([
+        $user3 = User::create([
             'name' => 'Jane Doe',
             'email' => 'user3@example.com',
             'password' => bcrypt('performativ1234u3'),
         ])->assignRole(RolesEnum::User);
 
-        $admin = User::factory()->create([
+        $admin = User::create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => bcrypt('performativAdmin1234'),
